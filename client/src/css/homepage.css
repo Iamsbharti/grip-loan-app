@@ -1,0 +1,23 @@
+.homepage {
+  width: 100%;
+  display: flex;
+  padding: 60px 60px 0px 70px;
+}
+.loanform {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.welcome-text {
+  font-size: 2.2rem;
+  font-weight: 600;
+}
+.disclaimer {
+  font-size: 0.9rem;
+  color: gray;
+}
+.submit-div {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
