@@ -21,6 +21,12 @@ const saveLoanDetailsValidation = async (req, res, next) => {
   next();
 };
 
+const getAllLoanvalidation = async (req, res, next) => {
+  console.log("Save loan  Request Validation");
+  next();
+};
+
 module.exports = {
   saveLoanDetailsValidation,
+  getAllLoanvalidation,
 };

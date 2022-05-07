@@ -2,6 +2,7 @@ const apiResponse = require("../library/apiResponse");
 const shortid = require("shortid");
 const connectMysql = require("../mysqldb");
 const mysql = require("mysql");
+const serverErrorMessage = "Internal Server Error";
 
 const saveLoanDetailsControl = async (req, res) => {
   console.log("Save loan details controller::", req.query);
@@ -51,7 +52,6 @@ const saveLoanDetailsControl = async (req, res) => {
     "','" +
     new Date().toLocaleString() +
     "')";
-  const serverErrorMessage = "Internal Server Error";
   connection.query(insertUserQuery, function (err, result) {
     if (err) {
       res.status(500).json(apiResponse(true, serverErrorMessage, null));
@@ -77,11 +77,23 @@ const saveLoanDetailsControl = async (req, res) => {
 };
 const getAllLoans = async (req, res) => {
   console.log("get all loans controller");
+  const connection = mysql.createConnection(process.env.MYSQL_DB);
   const getAllLoansQuery =
-    "SELECT users.name AS user, products.name AS favorite FROM users JOIN products ON users.favorite_product = products.id";
+    "SELECT users.username AS user,users.geoLocation loans.loanAmount FROM users JOIN loans ON users.loanId = loans.loanId";
+  connection.query(getAllLoansQuery, function (err, result) {
+    if (err) {
+      console.log(err);
+      res.status(500).json(apiResponse(true, serverErrorMessage, null));
+    } else {
+      connection.destroy();
+      res
+        .status(200)
+        .json(apiResponse(false, "All Loan Details Fetched", result));
+    }
+  });
 };
 const test = (request, response) => {
   response.status(200).send("ping success");
 };
 
-module.exports = { saveLoanDetailsControl, test };
+module.exports = { saveLoanDetailsControl, test, getAllLoans };
