@@ -1,4 +1,4 @@
 # grip-loan-app
 
-- [server](https://cookies-store.herokuapp.com/api)
-- [app](https://cookies-store.herokuapp.com)
+- [server](https://grip-loan-app.herokuapp.com/api)
+- [app](https://grip-loan-app.herokuapp.com)
