@@ -1,15 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import "../css/homepage.css";
 import Button from "@mui/material/Button";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import { saveLoanDetails, getUserLocation } from "../apis/apis";
+import LoanCalculator from "./LoanCalculator";
+import ReactDOM from "react-dom";
 const Homepage = () => {
   const [username, setUserName] = useState("");
   const [loanAmount, setLoanAmout] = useState("");
   const [loanPeriod, setLoanPeriod] = useState("");
+  const [ip, setIp] = useState("");
+  const [geoLocation, setGeoLocation] = useState("");
+  const [toggleLoanCalculator, setToggleLoanCalculator] = useState(true);
+  const [loanDetails, setLoanDetails] = useState({});
+  const loanViewRef = useRef(null);
+  const getUserData = async () => {
+    let response = await getUserLocation();
+    setIp(response.IPv4);
+    setGeoLocation(response.country_name);
+  };
+  useEffect(() => {
+    //passing getData method to the lifecycle method
+    getUserData();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,9 +42,16 @@ const Homepage = () => {
       default:
     }
   };
-  const handleLoanRequest = () => {
+  const handleLoanRequest = async () => {
     console.log("handle loan request", username, loanAmount, loanPeriod);
-    toast.success("Loan Request Applied Success");
+    let response = await saveLoanDetails(
+      username,
+      loanAmount,
+      loanPeriod,
+      ip,
+      geoLocation
+    );
+    toast.success(response.message);
     handleClearForm();
   };
 
@@ -37,6 +60,19 @@ const Homepage = () => {
     setUserName("");
     setLoanAmout("");
     setLoanPeriod("");
+    setToggleLoanCalculator(true);
+  };
+
+  const handleCalculateLoan = () => {
+    console.log("calculate loan");
+    let loanDetails = {
+      loanAmount,
+      loanPeriod,
+    };
+    setLoanDetails(loanDetails);
+    setToggleLoanCalculator(false);
+    let node = ReactDOM.findDOMNode(loanViewRef.current);
+    node.scrollIntoView({ block: "start", behavior: "smooth" });
   };
   return (
     <>
@@ -84,10 +120,17 @@ const Homepage = () => {
           <div className="submit-div">
             <Button
               variant="contained"
+              onClick={handleCalculateLoan}
+              disabled={username && loanAmount && loanPeriod ? false : true}
+            >
+              Loan Calculator
+            </Button>
+            <Button
+              variant="contained"
               onClick={handleLoanRequest}
               disabled={username && loanAmount && loanPeriod ? false : true}
             >
-              Submit
+              Apply
             </Button>
             <Button
               variant="contained"
@@ -97,11 +140,19 @@ const Homepage = () => {
               Clear
             </Button>
           </div>
+
           <span className="disclaimer">
             We collect your geolocation and IP Address.
           </span>
         </Box>
         <ToastContainer autoClose={3000} hideProgressBar />
+      </div>
+      <div
+        hidden={toggleLoanCalculator}
+        className="loanDetails"
+        ref={loanViewRef}
+      >
+        <LoanCalculator loanDetails={loanDetails} />
       </div>
     </>
   );

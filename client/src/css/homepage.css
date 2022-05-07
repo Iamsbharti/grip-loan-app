@@ -21,3 +21,7 @@
   justify-content: space-between;
   width: 100%;
 }
+.loanDetails {
+  padding-left: 70px;
+  height: 100vh;
+}
